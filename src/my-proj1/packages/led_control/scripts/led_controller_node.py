@@ -8,11 +8,13 @@ class LEDController:
     def __init__(self):
         rospy.init_node('led_controller_node', anonymous=True)
         rospy.loginfo("LED Controller Node initialized")
+        self.robot_name = os.environ.get('VEHICLE_NAME', 'duckiealexa')
     
     def set_led_pattern(self, pattern_name):
         try:
             # Use rosservice call command directly
-            cmd = f'rosservice call /duckiealexa/led_emitter_node/set_pattern "pattern_name: {{data: {pattern_name}}}"'
+            # cmd = f'rosservice call /duckiealexa/led_emitter_node/set_pattern "pattern_name: {{data: {pattern_name}}}"'
+            cmd = f'rosservice call /{self.robot_name}/led_emitter_node/set_pattern "pattern_name: {{data: {pattern_name}}}"'
             rospy.loginfo(f"Calling service: {cmd}")
             
             result = os.system(cmd)

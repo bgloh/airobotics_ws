@@ -4,15 +4,17 @@ import rospy
 import sys
 import threading
 from duckietown_msgs.msg import WheelsCmdStamped
+import os
 
 class MotorController:
     def __init__(self):
         rospy.init_node('motor_controller_node', anonymous=True)
         self.current_command = None
         self.command_lock = threading.Lock()
+        self.robot_name = os.environ.get('VEHICLE_NAME', 'duckiealexa')
         
         # Create publisher for wheel commands
-        self.pub = rospy.Publisher('/duckiealexa/wheels_driver_node/wheels_cmd', 
+        self.pub = rospy.Publisher(f'/{self.robot_name}/wheels_driver_node/wheels_cmd', 
                                   WheelsCmdStamped, queue_size=1)
         
         rospy.loginfo("Motor Controller Node initialized")
