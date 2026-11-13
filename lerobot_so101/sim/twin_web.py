@@ -364,10 +364,22 @@ def render_loop():
 
 
 # ── 웹 페이지 ───────────────────────────────────────────────
+# 관절 slider 범위 = MJCF 관절 range를 LeRobot 단위(도, gripper 0–100)로 바꾼 값.
+# 범위 밖 값(예: gripper 음수)을 넣으면 두 집게가 서로 통과하는 불가능한 자세가 되므로 막는다.
+def _slider_ranges():
+    mm = mujoco.MjModel.from_xml_path(args.scene)
+    lo, hi = np.zeros(len(JOINTS)), np.zeros(len(JOINTS))
+    for i, j in enumerate(JOINTS):
+        lo[i], hi[i] = mm.jnt_range[mm.joint(j).id]
+    a, b = sim_to_real(lo), sim_to_real(hi)
+    return {j: (int(round(min(a[f"{j}.pos"], b[f"{j}.pos"]))), int(round(max(a[f"{j}.pos"], b[f"{j}.pos"]))))
+            for j in JOINTS}
+SL_RANGE = _slider_ranges()
 SLIDERS = "".join(
-    f'<label>{j}<input type="range" min="-150" max="150" step="1" value="0" '
+    f'<label>{j}<input type="range" min="{SL_RANGE[j][0]}" max="{SL_RANGE[j][1]}" step="1" '
+    f'value="{int(round(state["main"][f"{j}.pos"]))}" '
     f'oninput="fetch(\'/set?j={j}&v=\'+this.value);this.nextElementSibling.textContent=this.value">'
-    f'<span>0</span></label>' for j in JOINTS)
+    f'<span>{int(round(state["main"][f"{j}.pos"]))}</span></label>' for j in JOINTS)
 PAGE = """<!doctype html><html><head><meta charset="utf-8"><title>SO-101 MuJoCo</title>
 <style>body{margin:0;background:#13233A;color:#F6F7F4;font-family:sans-serif;text-align:center}
 img{max-width:100%;border-radius:8px}button{font-size:17px;margin:6px 3px;padding:6px 12px}
@@ -428,7 +440,8 @@ class Handler(BaseHTTPRequestHandler):
             j, v = q.get("j", [""])[0], q.get("v", ["0"])[0]
             if j in JOINTS:
                 with lock:
-                    state["main"][f"{j}.pos"] = float(v)
+                    lo, hi = SL_RANGE[j]
+                    state["main"][f"{j}.pos"] = min(hi, max(lo, float(v)))
             self._send(b"", "text/plain", 204)
         elif u.path == "/start":
             go_evt.set()
