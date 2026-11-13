@@ -1,0 +1,7 @@
+# 실습 실행 결과 (조별로 생성)
+sim/*.csv
+sim/compare.png
+sim/sim_only.png
+sim/__pycache__/
+outputs/
+jetson_check.txt

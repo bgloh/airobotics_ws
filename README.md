@@ -14,6 +14,27 @@ src/
 │       ├── camera_control/       # 카메라 제어 패키지
 │       └── my_first_package/     # 기본 pub/sub 예제
 └── CLAUDE.md                     # 개발 가이드
+lerobot_so101/                    # 11주차 LeRobot SO-ARM101 실습
+```
+
+## 11주차 · LeRobot SO-ARM101 실습 (MuJoCo sim-to-real, teleoperation, ACT, Diffusion Policy)
+
+Jetson Orin NX + SO-ARM101 팔로 MuJoCo sim-to-real → teleoperation·시연 녹화 → ACT → Diffusion Policy 순서로 실습합니다.
+
+> 📖 **실습 안내**: [`lerobot_so101/README.md`](lerobot_so101/README.md)
+>
+> 강의 슬라이드: `SO-ARM101_LeRobot_실습.pptx` (LMS 배포, 이 repo에는 없음)
+
+**실습 방식:**
+- A: Jetson에 모니터·키보드를 직접 연결 → MuJoCo viewer 창, Rerun 창을 Jetson 화면에서 확인
+- B: PC에서 `ssh`로 접속 → `twin_web.py`로 MuJoCo 화면을 PC 브라우저(`http://<Jetson IP>:8000`)에서 확인
+
+**실습 폴더 준비 (Jetson 본체 터미널):**
+```bash
+if [ -d ~/airobotics_ws ]; then cd ~/airobotics_ws && git pull
+else git clone https://github.com/bgloh/airobotics_ws.git ~/airobotics_ws; fi
+bash ~/airobotics_ws/lerobot_so101/scripts/setup_lab.sh
+ls ~/so101_lab/sim
 ```
 
 ## 패키지 설명
